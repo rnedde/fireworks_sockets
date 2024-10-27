@@ -8,15 +8,14 @@ socket.on('connect', function() {
 
 //sketch variables
 let flowers = [];
-const MIN_SIZE = 20;
-const MAX_SIZE = 70;
-let numFlowers = 4;
+const MIN_SIZE = 10;
+const MAX_SIZE = 50;
+let numFlowers = 6;
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noFill();
-  strokeWeight(10);
 
   //Listen for messages named 'data' from the server
   socket.on('data', function(obj) {
@@ -64,27 +63,33 @@ function drawPos(pos) {
 class Flower {
   constructor(x, y) {
     this.position = createVector(x, y);
+
     this.currentFlowerSize = 0;
     this.currentPetalWidth = 0;
     this.currentPetalHeight = 0;
     this.finalFlowerSize = random(MIN_SIZE, MAX_SIZE);
     this.finalPetalWidth = random(0, MIN_SIZE);
     this.finalPetalHeight = random(0, MIN_SIZE);
-    this.rate = random(10, 30);
 
-    this.flowerGrowthRate = this.finalFlowerSize / this.rate;
-    this.petalWidthGrowthRate = this.finalPetalWidth / this.rate;
-    this.petalHeightGrowthRate = this.finalPetalHeight / this.rate;
+
+    this.growTime = random(10, 30);
+    this.flowerGrowthRate = this.finalFlowerSize / this.growTime;
+    this.petalWidthGrowthRate = this.finalPetalWidth / this.growTime;
+    this.petalHeightGrowthRate = this.finalPetalHeight / this.growTime;
+
 
     this.growthDelay = 0; // Counter for delay
     this.wait = random(0, 30);
 
     this.opacity = 255;
-    this.pentagon = random(0, 1);
-    this.numPetals = floor(random(3, 30));
+    this.shape = floor(random(0, 7));
+    this.numPetals = floor(random(3, 20));
     this.r = random(0, 255);
     this.g = random(0, 255);
     this.b = random(0, 255);
+    this.stroke = random(1,20);
+    this.blend = floor(random(0,4));
+
   }
 
   grow(index) {
@@ -103,24 +108,68 @@ class Flower {
   }
 
   display() {
+    
     push();
+    strokeWeight(this.stroke);
+    print(this.stroke);
+
     blendMode(SCREEN);
+    // For random blend modes 
+    // if (this.blend == 0){
+    //   blendMode(SCREEN)
+    // } else if(this.blend == 1) {
+    //   blendMode(ADD);
+    // }else if(this.blend == 2) {
+    //   blendMode(LIGHTEST);
+    // }else if(this.blend == 3) {
+    //   blendMode(DIFFERENCE);
+    // }
     stroke(this.r, this.g, this.b, this.opacity);
     setCenter(this.position.x, this.position.y);
 
-    if (this.pentagon < 0.5) {
+    if (this.shape == 0) {
       polarPentagons(
         this.numPetals,
         this.currentPetalWidth,
         this.currentFlowerSize
       );
-    } else {
+    } else if (this.shape == 1){
       polarEllipses(
         this.numPetals,
         this.currentPetalWidth,
         this.currentPetalHeight,
         this.currentFlowerSize
       );
+    } else if (this.shape == 2){
+      polarLines(
+        this.numPetals,
+        this.currentPetalWidth,
+        this.currentFlowerSize
+      )
+    }else if (this.shape == 3){
+      polarTriangles(
+        this.numPetals,
+        this.currentPetalWidth,
+        this.currentFlowerSize
+      )
+    }else if (this.shape == 4){
+      polarHexagons(
+        this.numPetals,
+        this.currentPetalWidth,
+        this.currentFlowerSize
+      )
+    }else if (this.shape == 5){
+      polarHeptagons(
+        this.numPetals,
+        this.currentPetalWidth,
+        this.currentFlowerSize
+      )
+    }else if (this.shape == 6){
+      polarOctagons(
+        this.numPetals,
+        this.currentPetalWidth,
+        this.currentFlowerSize
+      )
     }
     pop();
   }
